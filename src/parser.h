@@ -1,12 +1,19 @@
 #ifndef DS4TEST_PARSER_H
 #define DS4TEST_PARSER_H
+#define MAX_COMMAND_LENGTH 7
+#define MAX_VALUE_LENGTH 7
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+const char* l_command = "light";
+const char* lm_command = "lmotor";
+const char* hm_command = "hmotor";
+
 enum test_command_type{
     light_bar = 0,
     heavy_motor = 1,
     light_motor = 2,
+    invalid_command = -1
 };
 
 struct parsed_pair{
@@ -16,54 +23,50 @@ struct parsed_pair{
         int motor_value;
     } value;
 };
-
 struct parsed_pair parse_input(char* input, int input_length) {
-    char command[6] = {'\0','\0','\0','\0','\0','\0'};
-    char value[6] = {'\0','\0','\0','\0','\0','\0'};
-    int i = 0;
-    while(input[i] != ' ' && i < input_length) {
-        command[i] = input[i];
-        i++;
+    char command[MAX_COMMAND_LENGTH] = {'\0'};
+    char value[MAX_VALUE_LENGTH] = {'\0'};
+    char *space = strchr(input,' ');
+    struct parsed_pair command_value_pair;
+
+    if(space == NULL) {
+        printf("Invalid command.");
+        command_value_pair.command = invalid_command;
     }
-    i++;
-    while(input[i] != '\0' && i < input_length) {
-        printf("i: %d\n", i);
-        value[i] = input[i] + 48;
-        i++;
-    }
-    printf("2: %s\n",value);
-    struct parsed_pair tc;
-    if(strcmp(command,"light") == 0) {
-        tc.command = light_bar;
-    }
-    else if(strcmp(command,"hmotor") == 0) {
-        tc.command = heavy_motor;
-    }
-    else if(strcmp(command,"lmotor") == 0) {
-        tc.command = light_motor;
-    }
-    if(tc.command == light_bar) {
-        int red = 0, green = 0, blue = 0;
-        printf("%s\n",value);
-        sscanf(value,"%02x%02x%02x",&red,&green,&blue);
-        printf("%02x %02x %02x\n",red,green,blue);
-        tc.value.rgb[0] = red;
-        tc.value.rgb[1] = green;
-        tc.value.rgb[2] = blue;
-    }
-    else{
-        for(int i = 0; i < 3; i++) {
-            input[6 - i - 1] = input[i];
+    else {
+        int i = 0, j = 0;
+        while(input[i] != *space) {
+            command[i] = input[i];
+            i++;
         }
-        input[0] = 0;
-        input[1] = 0;
-        input[2] = 0;
-        sscanf(input,"%03d",&tc.value.motor_value);
-        if(tc.command == light_motor || tc.command == heavy_motor && (tc.value.motor_value < 0 || tc.value.motor_value > 0)) {
-            tc.value.motor_value = 0;
+        i++;
+        while(input[i] != '\0' && input[i] != '\n' && i < input_length) {
+            value[j] = input[i];
+            j++;
+            i++;
+        }
+        if(strcmp(command,l_command) == 0) {
+            command_value_pair.command = light_bar;
+            sscanf(value,"%02x%02x%02x",&command_value_pair.value.rgb[0],&command_value_pair.value.rgb[1],&command_value_pair.value.rgb[2]);
+        }
+        else {
+            long motor_value = strtol(value,NULL,10);
+            if(motor_value < 0 || motor_value > 255) {
+                motor_value = 0;
+            }
+            command_value_pair.value.motor_value = motor_value;
+            if(strcmp(command,lm_command) == 0) {
+                command_value_pair.command = light_motor;
+            }
+            else if(strcmp(command,hm_command) ==0) {
+                command_value_pair.command = heavy_motor;
+            }
+            else {
+                command_value_pair.command = invalid_command;
+            }
         }
     }
-    return tc;
+    return command_value_pair;
 }
 
 void create_buffer(unsigned char* buffer, int buffer_length, struct parsed_pair* pp) {
