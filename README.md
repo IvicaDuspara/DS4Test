@@ -9,11 +9,12 @@ This is a C program designed for testing communication with The DUALSHOCK4® con
 
 ---------------------------------------------------------
 <a name="Intro"></a>
-##Introduction
+## Introduction
 I decided that it would be fun to learn more about Linux device drivers. So I decided to 
-write this program.
+write this program. Strictly speaking this program is not a driver. This 
+is merely communication test.
 
-This program is a stepping stone for future work where I plan to write
+This program is intended a stepping stone for future work where I plan to write
 user-space driver which would allow:
 
 * Connection via USB or Bluetooth
@@ -23,10 +24,32 @@ user-space driver which would allow:
 * Saving configurations of joystick
 --------------------------------------------------------
 <a name="Building"></a>
-##Building
+## Building
 TODO: add this 
 
 -----------------------------------------------------------
 <a name="Running"></a>
-##Running
-TODO: add this
+## Running
+If you built this project successfully default name of executable is DS4Test
+```
+root@user:/home/user/# ./DS4Test 
+```
+Once DS4Test is running you can use commands.
+Examples of commands:
+
+This command changes light bar to red
+
+```
+light ff0000
+```
+
+This command rumbles heavy motor (1 weakest rumble, 255 strongest rumble)
+```
+hmotor 127
+```
+
+This command rumbles light motor (1 weakest rumble, 255 strongest rumble)
+
+```
+lmotor 202
+```
