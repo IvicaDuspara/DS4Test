@@ -25,15 +25,30 @@ user-space driver which would allow:
 --------------------------------------------------------
 <a name="Building"></a>
 ## Building
-TODO: add this 
+For building system CMake is used. Here is an example
+which assumes you downloaded code into your home folder
+
+```
+z@user: ~/DS4Test$ mkdir build
+z@user: ~/DS4Test$ cd build
+z@user: ~/DS4Test/build$ cmake ..
+z@user: ~/DS4Test/build$ cmake --build .
+```
+
+You will see generated folders inside build folder. Enter in src
+folder. There you will find an executable called DS4Test
 
 -----------------------------------------------------------
 <a name="Running"></a>
 ## Running
-If you built this project successfully default name of executable is DS4Test
+If you built this project successfully default name of executable is DS4Test.
+Executable takes one argument - absoulte path to hidraw file in /dev/ which
+represents controller. 
 ```
-root@user:/home/user/# ./DS4Test 
+root@user:/home/user/DS4Test/build/src# ./DS4Test /dev/hidraw1
 ```
+This implies that controller is recognizes as /dev/hidraw1.
+
 Once DS4Test is running you can use commands.
 Examples of commands:
 
